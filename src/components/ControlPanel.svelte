@@ -13,7 +13,9 @@
     <h3>Noise</h3>
 
     <label>
-      Seed
+      <div class="row">
+        <span class="param-name" data-tooltip="Initialises the random number generator. Every integer produces a completely different terrain — same seed always gives the same result.">Seed</span>
+      </div>
       <div class="row">
         <input
           type="number"
@@ -23,47 +25,54 @@
           oninput={(e) => set('seed', parseInt(e.currentTarget.value) || 0)}
         />
       </div>
-      <span class="hint">Initialises the random number generator. Every integer produces a completely different terrain — same seed always gives the same result.</span>
     </label>
 
     <label>
-      Scale <span class="value">{$terrainParams.scale.toFixed(1)}</span>
+      <div class="row">
+        <span class="param-name" data-tooltip="Zooms the noise pattern. Higher values spread features out, creating broad mountains and wide valleys. Lower values compress them into tighter, busier terrain.">Scale</span>
+        <span class="value">{$terrainParams.scale.toFixed(1)}</span>
+      </div>
       <input
         type="range" min="0.5" max="10" step="0.1"
         value={$terrainParams.scale}
         oninput={(e) => set('scale', +e.currentTarget.value)}
       />
-      <span class="hint">Zooms the noise pattern. Higher values spread features out, creating broad mountains and wide valleys. Lower values compress them into tighter, busier terrain.</span>
     </label>
 
     <label>
-      Octaves <span class="value">{$terrainParams.octaves}</span>
+      <div class="row">
+        <span class="param-name" data-tooltip="Number of noise layers stacked together. Each additional octave adds a finer layer of detail on top of the coarser shape beneath it.">Octaves</span>
+        <span class="value">{$terrainParams.octaves}</span>
+      </div>
       <input
         type="range" min="1" max="8" step="1"
         value={$terrainParams.octaves}
         oninput={(e) => set('octaves', +e.currentTarget.value)}
       />
-      <span class="hint">Number of noise layers stacked together. Each additional octave adds a finer layer of detail on top of the coarser shape beneath it.</span>
     </label>
 
     <label>
-      Persistence <span class="value">{$terrainParams.persistence.toFixed(2)}</span>
+      <div class="row">
+        <span class="param-name" data-tooltip="How much each successive octave contributes relative to the one before. Lower values (≈ 0.5) fade out finer detail, producing smoother terrain. Higher values keep detail loud, creating rougher, more jagged surfaces.">Persistence</span>
+        <span class="value">{$terrainParams.persistence.toFixed(2)}</span>
+      </div>
       <input
         type="range" min="0.1" max="1" step="0.01"
         value={$terrainParams.persistence}
         oninput={(e) => set('persistence', +e.currentTarget.value)}
       />
-      <span class="hint">How much each successive octave contributes relative to the one before. Lower values (≈ 0.5) fade out finer detail, producing smoother terrain. Higher values keep detail loud, creating rougher, more jagged surfaces.</span>
     </label>
 
     <label>
-      Lacunarity <span class="value">{$terrainParams.lacunarity.toFixed(2)}</span>
+      <div class="row">
+        <span class="param-name" data-tooltip="How much the frequency multiplies per octave. At 2.0 each layer is twice as fine as the previous. Higher values jump to much finer scales each layer, increasing surface complexity.">Lacunarity</span>
+        <span class="value">{$terrainParams.lacunarity.toFixed(2)}</span>
+      </div>
       <input
         type="range" min="1" max="4" step="0.05"
         value={$terrainParams.lacunarity}
         oninput={(e) => set('lacunarity', +e.currentTarget.value)}
       />
-      <span class="hint">How much the frequency multiplies per octave. At 2.0 each layer is twice as fine as the previous. Higher values make successive layers jump to much finer scales, increasing surface complexity.</span>
     </label>
   </section>
 
@@ -71,27 +80,33 @@
     <h3>Terrain</h3>
 
     <label>
-      Height scale <span class="value">{$terrainParams.heightScale}</span>
+      <div class="row">
+        <span class="param-name" data-tooltip="Vertical exaggeration in world units. Stretches the normalised [0–1] heightmap values into actual 3D height. Does not change the shape of the terrain, only how tall it appears.">Height scale</span>
+        <span class="value">{$terrainParams.heightScale}</span>
+      </div>
       <input
         type="range" min="1" max="100" step="1"
         value={$terrainParams.heightScale}
         oninput={(e) => set('heightScale', +e.currentTarget.value)}
       />
-      <span class="hint">Vertical exaggeration in world units. Stretches the normalised [0–1] heightmap values into actual 3D height. Does not change the shape of the terrain, only how tall it appears.</span>
     </label>
 
     <label>
-      Sea level <span class="value">{$terrainParams.seaLevel.toFixed(2)}</span>
+      <div class="row">
+        <span class="param-name" data-tooltip="Height at which the water plane is placed, as a fraction of the full terrain range. Raising it floods more of the landscape; lowering it exposes more land.">Sea level</span>
+        <span class="value">{$terrainParams.seaLevel.toFixed(2)}</span>
+      </div>
       <input
         type="range" min="0" max="1" step="0.01"
         value={$terrainParams.seaLevel}
         oninput={(e) => set('seaLevel', +e.currentTarget.value)}
       />
-      <span class="hint">Height at which the water plane is placed, as a fraction of the full terrain range. Raising it floods more of the landscape; lowering it exposes more land.</span>
     </label>
 
     <label>
-      Resolution
+      <div class="row">
+        <span class="param-name" data-tooltip="Grid divisions along each axis. Higher values produce smoother, more detailed meshes but increase generation time and GPU vertex count.">Resolution</span>
+      </div>
       <select
         value={$terrainParams.resolution}
         onchange={(e) => set('resolution', +e.currentTarget.value)}
@@ -101,7 +116,6 @@
         <option value={256}>256 × 256</option>
         <option value={512}>512 × 512</option>
       </select>
-      <span class="hint">Grid divisions along each axis. Higher values produce smoother, more detailed meshes but increase generation time and GPU vertex count.</span>
     </label>
   </section>
 </div>
@@ -153,21 +167,48 @@
     color: #c0c0d0;
   }
 
+  .row {
+    display: flex;
+    align-items: center;
+  }
+
   .value {
     margin-left: auto;
     color: #80c0ff;
     font-variant-numeric: tabular-nums;
   }
 
-  label > :first-child {
-    display: flex;
-    align-items: center;
+  /* Tooltip anchor */
+  .param-name {
+    position: relative;
+    cursor: help;
+    border-bottom: 1px dotted #505060;
+    width: fit-content;
   }
 
-  .hint {
+  /* Tooltip bubble */
+  .param-name::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    width: 220px;
+    background: #1a1a24;
+    border: 1px solid #3a3a50;
+    border-radius: 4px;
+    color: #a0a8b8;
     font-size: 10px;
-    line-height: 1.5;
-    color: #505060;
+    line-height: 1.55;
+    padding: 6px 9px;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    white-space: normal;
+  }
+
+  .param-name:hover::after {
+    opacity: 1;
   }
 
   input[type='range'] {
@@ -195,9 +236,5 @@
     padding: 4px 8px;
     font-size: 12px;
     cursor: pointer;
-  }
-
-  .row {
-    width: 100%;
   }
 </style>
