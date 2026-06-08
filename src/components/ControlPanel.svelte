@@ -1,8 +1,12 @@
 <script lang="ts">
-  import { terrainParams } from '../stores/terrain';
+  import { terrainParams, waterParams } from '../stores/terrain';
 
   function set<K extends keyof typeof $terrainParams>(key: K, value: typeof $terrainParams[K]) {
     terrainParams.update((p) => ({ ...p, [key]: value }));
+  }
+
+  function setWater<K extends keyof typeof $waterParams>(key: K, value: typeof $waterParams[K]) {
+    waterParams.update((p) => ({ ...p, [key]: value }));
   }
 </script>
 
@@ -118,6 +122,45 @@
       </select>
     </label>
   </section>
+
+  <section>
+    <h3>Water</h3>
+
+    <label>
+      <div class="row">
+        <span class="param-name" data-tooltip="Base colour of the water surface. Combined with opacity and roughness to determine how the water looks under lighting.">Color</span>
+      </div>
+      <input
+        type="color"
+        value={$waterParams.waterColor}
+        oninput={(e) => setWater('waterColor', e.currentTarget.value)}
+      />
+    </label>
+
+    <label>
+      <div class="row">
+        <span class="param-name" data-tooltip="How transparent the water is. Lower values let you see terrain beneath the surface; higher values make the water more opaque.">Opacity</span>
+        <span class="value">{$waterParams.waterOpacity.toFixed(2)}</span>
+      </div>
+      <input
+        type="range" min="0" max="1" step="0.01"
+        value={$waterParams.waterOpacity}
+        oninput={(e) => setWater('waterOpacity', +e.currentTarget.value)}
+      />
+    </label>
+
+    <label>
+      <div class="row">
+        <span class="param-name" data-tooltip="Surface roughness of the water. Low values produce a mirror-like sheen; high values scatter light for a matte, choppy appearance.">Roughness</span>
+        <span class="value">{$waterParams.waterRoughness.toFixed(2)}</span>
+      </div>
+      <input
+        type="range" min="0" max="1" step="0.01"
+        value={$waterParams.waterRoughness}
+        oninput={(e) => setWater('waterRoughness', +e.currentTarget.value)}
+      />
+    </label>
+  </section>
 </div>
 
 <style>
@@ -214,6 +257,16 @@
   input[type='range'] {
     width: 100%;
     accent-color: #4a90d9;
+    cursor: pointer;
+  }
+
+  input[type='color'] {
+    width: 100%;
+    height: 28px;
+    padding: 2px 3px;
+    background: #222228;
+    border: 1px solid #3a3a44;
+    border-radius: 4px;
     cursor: pointer;
   }
 

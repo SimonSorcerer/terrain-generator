@@ -1,10 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
-  import { terrainParams, heightmap } from '../stores/terrain';
+  import { terrainParams, heightmap, waterParams } from '../stores/terrain';
   import { initScene } from '../lib/renderer/scene';
   import { createTerrainMesh, updateTerrainMesh } from '../lib/renderer/terrain-mesh';
-  import { createWaterMesh, updateWaterLevel } from '../lib/renderer/water-mesh';
+  import { createWaterMesh, updateWaterLevel, updateWaterAppearance } from '../lib/renderer/water-mesh';
   import { DEFAULT_BIOMES } from '../lib/terrain/biomes';
 
   let canvas: HTMLCanvasElement;
@@ -17,11 +17,17 @@
     ctx.scene.add(terrain.mesh);
     ctx.scene.add(water.mesh);
 
-    // Runs on every param change — heightmap is derived so it recomputes automatically.
-    const unsub = heightmap.subscribe((hm) => {
+    // Terrain + water level: driven by terrainParams (heightmap recomputes on any change).
+    const unsubTerrain = heightmap.subscribe((hm) => {
       const p = get(terrainParams);
       updateTerrainMesh(terrain, hm, p.heightScale, DEFAULT_BIOMES);
       updateWaterLevel(water, p.seaLevel, p.heightScale);
+    });
+
+    // Water appearance: separate subscription so tweaking color/opacity never
+    // triggers a heightmap regeneration.
+    const unsubWater = waterParams.subscribe((wp) => {
+      updateWaterAppearance(water, wp);
     });
 
     const ro = new ResizeObserver((entries) => {
@@ -34,7 +40,8 @@
     ctx.startLoop();
 
     return () => {
-      unsub();
+      unsubTerrain();
+      unsubWater();
       ro.disconnect();
       ctx.dispose();
     };

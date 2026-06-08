@@ -2,6 +2,20 @@ import { writable, derived } from 'svelte/store';
 import { generateHeightmap } from '../lib/terrain/heightmap';
 import type { NoiseParams } from '../lib/terrain/noise';
 
+export interface WaterParams {
+  waterColor: string;   // CSS hex string, e.g. '#2255aa'
+  waterOpacity: number; // 0–1
+  waterRoughness: number; // 0–1
+}
+
+export const DEFAULT_WATER_PARAMS: WaterParams = {
+  waterColor: '#2255aa',
+  waterOpacity: 0.6,
+  waterRoughness: 0.1,
+};
+
+export const waterParams = writable<WaterParams>({ ...DEFAULT_WATER_PARAMS });
+
 export interface TerrainParams extends NoiseParams {
   resolution: number;
   heightScale: number;

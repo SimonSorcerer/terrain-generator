@@ -24,3 +24,12 @@ export function createWaterMesh(): WaterMesh {
 export function updateWaterLevel(water: WaterMesh, seaLevel: number, heightScale: number): void {
   water.mesh.position.y = seaLevel * heightScale;
 }
+
+export function updateWaterAppearance(
+  water: WaterMesh,
+  params: { waterColor: string; waterOpacity: number; waterRoughness: number },
+): void {
+  water.mesh.material.color.set(params.waterColor);
+  water.mesh.material.opacity = params.waterOpacity;
+  water.mesh.material.roughness = params.waterRoughness;
+}
