@@ -55,12 +55,29 @@ src/
 - `water-mesh.ts` creates a semi-transparent `MeshStandardMaterial` plane positioned at the sea-level height.
 - `DirectionalLight` + `AmbientLight` are set up in `scene.ts`.
 
+## Testing
+
+Critical algorithmic functions and critical logic must have unit tests. This covers all of `lib/terrain/` (noise, heightmap, biomes) and any non-trivial pure functions added in future.
+
+Use **Vitest** (already compatible with the Vite setup — add it as a dev dependency when writing the first test). Test files live alongside source files as `*.test.ts`.
+
+What to test:
+- Output ranges and invariants (e.g. heightmap values always in `[0, 1]`)
+- Seed determinism and independence
+- Biome color interpolation correctness and boundary conditions
+- Any math-heavy helper with non-obvious edge cases
+
+What not to test:
+- Three.js renderer code (requires a WebGL context — not worth mocking)
+- Svelte components (covered by manual UI testing)
+
 ## Dev commands
 
 ```
 npm run dev    # Vite dev server
 npm run build  # Production build
 npm run check  # Svelte type-check
+npm run test   # Unit tests (once Vitest is set up)
 ```
 
 ## Conventions
