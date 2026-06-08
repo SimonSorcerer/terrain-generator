@@ -23,6 +23,7 @@
           oninput={(e) => set('seed', parseInt(e.currentTarget.value) || 0)}
         />
       </div>
+      <span class="hint">Initialises the random number generator. Every integer produces a completely different terrain — same seed always gives the same result.</span>
     </label>
 
     <label>
@@ -32,6 +33,7 @@
         value={$terrainParams.scale}
         oninput={(e) => set('scale', +e.currentTarget.value)}
       />
+      <span class="hint">Zooms the noise pattern. Higher values spread features out, creating broad mountains and wide valleys. Lower values compress them into tighter, busier terrain.</span>
     </label>
 
     <label>
@@ -41,6 +43,7 @@
         value={$terrainParams.octaves}
         oninput={(e) => set('octaves', +e.currentTarget.value)}
       />
+      <span class="hint">Number of noise layers stacked together. Each additional octave adds a finer layer of detail on top of the coarser shape beneath it.</span>
     </label>
 
     <label>
@@ -50,6 +53,7 @@
         value={$terrainParams.persistence}
         oninput={(e) => set('persistence', +e.currentTarget.value)}
       />
+      <span class="hint">How much each successive octave contributes relative to the one before. Lower values (≈ 0.5) fade out finer detail, producing smoother terrain. Higher values keep detail loud, creating rougher, more jagged surfaces.</span>
     </label>
 
     <label>
@@ -59,6 +63,7 @@
         value={$terrainParams.lacunarity}
         oninput={(e) => set('lacunarity', +e.currentTarget.value)}
       />
+      <span class="hint">How much the frequency multiplies per octave. At 2.0 each layer is twice as fine as the previous. Higher values make successive layers jump to much finer scales, increasing surface complexity.</span>
     </label>
   </section>
 
@@ -72,6 +77,7 @@
         value={$terrainParams.heightScale}
         oninput={(e) => set('heightScale', +e.currentTarget.value)}
       />
+      <span class="hint">Vertical exaggeration in world units. Stretches the normalised [0–1] heightmap values into actual 3D height. Does not change the shape of the terrain, only how tall it appears.</span>
     </label>
 
     <label>
@@ -81,6 +87,7 @@
         value={$terrainParams.seaLevel}
         oninput={(e) => set('seaLevel', +e.currentTarget.value)}
       />
+      <span class="hint">Height at which the water plane is placed, as a fraction of the full terrain range. Raising it floods more of the landscape; lowering it exposes more land.</span>
     </label>
 
     <label>
@@ -94,6 +101,7 @@
         <option value={256}>256 × 256</option>
         <option value={512}>512 × 512</option>
       </select>
+      <span class="hint">Grid divisions along each axis. Higher values produce smoother, more detailed meshes but increase generation time and GPU vertex count.</span>
     </label>
   </section>
 </div>
@@ -154,6 +162,12 @@
   label > :first-child {
     display: flex;
     align-items: center;
+  }
+
+  .hint {
+    font-size: 10px;
+    line-height: 1.5;
+    color: #505060;
   }
 
   input[type='range'] {
