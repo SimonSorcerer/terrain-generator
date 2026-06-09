@@ -1,47 +1,42 @@
-# Svelte + TS + Vite
+# Terrain Generator
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+A browser-based procedural terrain generator for exploring and comparing different heightmap generation algorithms. Built with Svelte 5, Three.js, and TypeScript.
 
-## Recommended IDE Setup
+## Generators
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+| Algorithm | Description |
+|---|---|
+| **Simplex fBm** | Fractal Brownian Motion layering multiple octaves of simplex noise. The baseline algorithm — smooth, natural-looking terrain with controllable roughness. |
+| **Domain Warped** | Quilez-style coordinate displacement where a second noise field warps the input coordinates before sampling the main noise. Produces flowing, organic shapes with streaked valleys. |
+| **Ridged Multifractal** | Inverts and sharpens each noise octave (`(1 − |n|)^sharpness`) to produce sharp mountain ridges and deep valleys instead of rolling hills. |
+| **Hydraulic Erosion** | Particle-based water simulation: thousands of droplets flow downhill, eroding steep faces and depositing sediment in valleys. Optional thermal erosion pass smooths the resulting cliffs into scree slopes. |
 
-## Need an official Svelte framework?
+All generators share common noise parameters (seed, scale, octaves, persistence, lacunarity) and scene controls (fog, sun azimuth/elevation/intensity).
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+## Screenshots
 
-## Technical considerations
+Ridged Multifractal with fog:
 
-**Why use this over SvelteKit?**
+![Ridged Multifractal](public/screenshot.png)
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+Domain Warped with dark fog:
 
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+![Domain Warped](public/screenshot-2.png)
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+Hydraulic Erosion archipelago:
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+![Hydraulic Erosion](public/screenshot-3.png)
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+## Running locally
 
-**Why include `.vscode/extensions.json`?**
-
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
-
-**Why enable `allowJs` in the TS template?**
-
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
 ```
+npm install
+npm run dev
+```
+
+## Tech stack
+
+- [Svelte 5](https://svelte.dev) + [Vite](https://vitejs.dev)
+- [Three.js](https://threejs.org) — WebGL rendering, OrbitControls
+- [simplex-noise](https://github.com/jwagner/simplex-noise) — noise primitives
+- [Vitest](https://vitest.dev) — unit tests for all terrain math (`npm run test`)
