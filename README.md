@@ -2,6 +2,8 @@
 
 A browser-based procedural terrain generator for exploring and comparing different heightmap generation algorithms. Built with Svelte 5, Three.js, and TypeScript.
 
+**Live demo:** https://terrain-generator-ashen.vercel.app/
+
 ## Generators
 
 | Algorithm               | Description                                                                                                                                                                                                 |
