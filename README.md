@@ -4,12 +4,12 @@ A browser-based procedural terrain generator for exploring and comparing differe
 
 ## Generators
 
-| Algorithm | Description |
-|---|---|
-| **Simplex fBm** | Fractal Brownian Motion layering multiple octaves of simplex noise. The baseline algorithm — smooth, natural-looking terrain with controllable roughness. |
-| **Domain Warped** | Quilez-style coordinate displacement where a second noise field warps the input coordinates before sampling the main noise. Produces flowing, organic shapes with streaked valleys. |
-| **Ridged Multifractal** | Inverts and sharpens each noise octave (`(1 − |n|)^sharpness`) to produce sharp mountain ridges and deep valleys instead of rolling hills. |
-| **Hydraulic Erosion** | Particle-based water simulation: thousands of droplets flow downhill, eroding steep faces and depositing sediment in valleys. Optional thermal erosion pass smooths the resulting cliffs into scree slopes. |
+| Algorithm               | Description                                                                                                                                                                                                 |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Simplex fBm**         | Fractal Brownian Motion layering multiple octaves of simplex noise. The baseline algorithm — smooth, natural-looking terrain with controllable roughness.                                                   |
+| **Domain Warped**       | Quilez-style coordinate displacement where a second noise field warps the input coordinates before sampling the main noise. Produces flowing, organic shapes with streaked valleys.                         |
+| **Ridged Multifractal** | Inverts and sharpens each noise octave to produce sharp mountain ridges and deep valleys instead of rolling hills.                                                                                          |
+| **Hydraulic Erosion**   | Particle-based water simulation: thousands of droplets flow downhill, eroding steep faces and depositing sediment in valleys. Optional thermal erosion pass smooths the resulting cliffs into scree slopes. |
 
 All generators share common noise parameters (seed, scale, octaves, persistence, lacunarity) and scene controls (fog, sun azimuth/elevation/intensity).
 
