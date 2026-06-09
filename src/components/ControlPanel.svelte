@@ -1,5 +1,6 @@
 <script lang="ts">
   import { terrainParams, waterParams } from '../stores/terrain';
+  import { GENERATORS, GENERATOR_LABELS } from '../lib/terrain/generator';
 
   function set<K extends keyof typeof $terrainParams>(key: K, value: typeof $terrainParams[K]) {
     terrainParams.update((p) => ({ ...p, [key]: value }));
@@ -85,6 +86,148 @@
 
     <label>
       <div class="row">
+        <span class="param-name" data-tooltip="The algorithm used to generate the heightmap. Each algorithm produces a different style of terrain.">Generator</span>
+      </div>
+      <select
+        value={$terrainParams.generatorType}
+        onchange={(e) => set('generatorType', e.currentTarget.value)}
+      >
+        {#each Object.keys(GENERATORS) as key}
+          <option value={key}>{GENERATOR_LABELS[key] ?? key}</option>
+        {/each}
+      </select>
+    </label>
+
+    {#if $terrainParams.generatorType === 'domain-warped'}
+      <label>
+        <div class="row">
+          <span class="param-name" data-tooltip="How far the input coordinates are displaced before sampling. Higher values produce more twisted, flowing terrain shapes.">Warp strength</span>
+          <span class="value">{$terrainParams.warpStrength.toFixed(2)}</span>
+        </div>
+        <input
+          type="range" min="0" max="2" step="0.05"
+          value={$terrainParams.warpStrength}
+          oninput={(e) => set('warpStrength', +e.currentTarget.value)}
+        />
+      </label>
+
+      <label>
+        <div class="row">
+          <span class="param-name" data-tooltip="Frequency of the warp noise relative to the main noise. Lower values create broad, gradual deformations; higher values create fine, chaotic warping.">Warp scale</span>
+          <span class="value">{$terrainParams.warpScale.toFixed(2)}</span>
+        </div>
+        <input
+          type="range" min="0.1" max="3" step="0.05"
+          value={$terrainParams.warpScale}
+          oninput={(e) => set('warpScale', +e.currentTarget.value)}
+        />
+      </label>
+    {/if}
+
+    {#if $terrainParams.generatorType === 'ridged'}
+      <label>
+        <div class="row">
+          <span class="param-name" data-tooltip="Controls how sharp the ridge peaks are. At 1 ridges are broad and rounded; higher values produce thinner, knife-edge peaks.">Sharpness</span>
+          <span class="value">{$terrainParams.sharpness.toFixed(1)}</span>
+        </div>
+        <input
+          type="range" min="1" max="4" step="0.1"
+          value={$terrainParams.sharpness}
+          oninput={(e) => set('sharpness', +e.currentTarget.value)}
+        />
+      </label>
+    {/if}
+
+    {#if $terrainParams.generatorType === 'hydraulic'}
+      <p class="hint">Heavy computation — avoid moving sliders rapidly.</p>
+
+      <label>
+        <div class="row">
+          <span class="param-name" data-tooltip="Number of water droplets simulated. More droplets produce smoother, more detailed erosion but take longer to compute.">Droplets</span>
+          <span class="value">{$terrainParams.dropletCount.toLocaleString()}</span>
+        </div>
+        <input
+          type="range" min="1000" max="100000" step="1000"
+          value={$terrainParams.dropletCount}
+          oninput={(e) => set('dropletCount', +e.currentTarget.value)}
+        />
+      </label>
+
+      <label>
+        <div class="row">
+          <span class="param-name" data-tooltip="Radius (in grid cells) over which each erosion event is spread. Larger values produce smoother, more gradual erosion; smaller values dig sharper, more defined channels.">Erosion radius</span>
+          <span class="value">{$terrainParams.erosionRadius}</span>
+        </div>
+        <input
+          type="range" min="1" max="6" step="1"
+          value={$terrainParams.erosionRadius}
+          oninput={(e) => set('erosionRadius', +e.currentTarget.value)}
+        />
+      </label>
+
+      <label>
+        <div class="row">
+          <span class="param-name" data-tooltip="How much a droplet retains its current direction versus turning to follow the gradient. Higher inertia produces longer, straighter channels; lower values produce more winding paths.">Inertia</span>
+          <span class="value">{$terrainParams.inertia.toFixed(2)}</span>
+        </div>
+        <input
+          type="range" min="0" max="1" step="0.01"
+          value={$terrainParams.inertia}
+          oninput={(e) => set('inertia', +e.currentTarget.value)}
+        />
+      </label>
+
+      <label>
+        <div class="row">
+          <span class="param-name" data-tooltip="Speed at which a droplet picks up sediment from the terrain when it has capacity. Higher values carve deeper channels faster.">Erosion speed</span>
+          <span class="value">{$terrainParams.erodeSpeed.toFixed(2)}</span>
+        </div>
+        <input
+          type="range" min="0" max="1" step="0.01"
+          value={$terrainParams.erodeSpeed}
+          oninput={(e) => set('erodeSpeed', +e.currentTarget.value)}
+        />
+      </label>
+
+      <label>
+        <div class="row">
+          <span class="param-name" data-tooltip="Speed at which excess sediment is deposited onto the terrain. Higher values produce more pronounced alluvial fans and sediment plains.">Deposit speed</span>
+          <span class="value">{$terrainParams.depositSpeed.toFixed(2)}</span>
+        </div>
+        <input
+          type="range" min="0" max="1" step="0.01"
+          value={$terrainParams.depositSpeed}
+          oninput={(e) => set('depositSpeed', +e.currentTarget.value)}
+        />
+      </label>
+
+      <label>
+        <div class="row">
+          <span class="param-name" data-tooltip="Rate at which water evaporates each step. Higher values make droplets die sooner, creating shorter channels; lower values let droplets travel farther.">Evaporate speed</span>
+          <span class="value">{$terrainParams.evaporateSpeed.toFixed(3)}</span>
+        </div>
+        <input
+          type="range" min="0.001" max="0.05" step="0.001"
+          value={$terrainParams.evaporateSpeed}
+          oninput={(e) => set('evaporateSpeed', +e.currentTarget.value)}
+        />
+      </label>
+
+      <label>
+        <div class="row">
+          <span class="param-name" data-tooltip="Gravitational acceleration applied to droplet speed. Higher gravity makes droplets accelerate faster on slopes, eroding more on steep terrain.">Gravity</span>
+          <span class="value">{$terrainParams.gravity.toFixed(1)}</span>
+        </div>
+        <input
+          type="range" min="1" max="20" step="0.5"
+          value={$terrainParams.gravity}
+          oninput={(e) => set('gravity', +e.currentTarget.value)}
+        />
+      </label>
+    {/if}
+
+    <label>
+      <div class="row">
         <span class="param-name" data-tooltip="Vertical exaggeration in world units. Stretches the normalised [0–1] heightmap values into actual 3D height. Does not change the shape of the terrain, only how tall it appears.">Height scale</span>
         <span class="value">{$terrainParams.heightScale}</span>
       </div>
@@ -164,6 +307,12 @@
 </div>
 
 <style>
+  .hint {
+    margin: 0;
+    font-size: 10px;
+    color: #a08040;
+    font-style: italic;
+  }
   .panel {
     padding: 16px;
     display: flex;

@@ -1,11 +1,11 @@
 import { writable, derived } from 'svelte/store';
-import { generateHeightmap } from '../lib/terrain/heightmap';
-import type { NoiseParams } from '../lib/terrain/noise';
+import { GENERATORS } from '../lib/terrain/generator';
+import type { GeneratorParams } from '../lib/terrain/generator';
 
 export interface WaterParams {
-  waterColor: string;   // CSS hex string, e.g. '#2255aa'
-  waterOpacity: number; // 0–1
-  waterRoughness: number; // 0–1
+  waterColor: string;
+  waterOpacity: number;
+  waterRoughness: number;
 }
 
 export const DEFAULT_WATER_PARAMS: WaterParams = {
@@ -16,10 +16,21 @@ export const DEFAULT_WATER_PARAMS: WaterParams = {
 
 export const waterParams = writable<WaterParams>({ ...DEFAULT_WATER_PARAMS });
 
-export interface TerrainParams extends NoiseParams {
-  resolution: number;
+export interface TerrainParams extends GeneratorParams {
   heightScale: number;
   seaLevel: number;
+  generatorType: string;
+  warpStrength: number;
+  warpScale: number;
+  sharpness: number;
+  dropletCount: number;
+  inertia: number;
+  sedimentCapacityFactor: number;
+  depositSpeed: number;
+  erodeSpeed: number;
+  evaporateSpeed: number;
+  gravity: number;
+  erosionRadius: number;
 }
 
 export const DEFAULT_PARAMS: TerrainParams = {
@@ -31,11 +42,23 @@ export const DEFAULT_PARAMS: TerrainParams = {
   resolution: 128,
   heightScale: 30,
   seaLevel: 0.35,
+  generatorType: 'simplex',
+  warpStrength: 0.5,
+  warpScale: 1.0,
+  sharpness: 2,
+  dropletCount: 50_000,
+  inertia: 0.05,
+  sedimentCapacityFactor: 4,
+  depositSpeed: 0.3,
+  erodeSpeed: 0.3,
+  evaporateSpeed: 0.01,
+  gravity: 10,
+  erosionRadius: 3,
 };
 
 export const terrainParams = writable<TerrainParams>({ ...DEFAULT_PARAMS });
 
-// Recomputes the heightmap whenever any param changes.
-export const heightmap = derived(terrainParams, ($p) =>
-  generateHeightmap($p.resolution, $p),
-);
+export const heightmap = derived(terrainParams, ($p) => {
+  const generator = GENERATORS[$p.generatorType] ?? GENERATORS['simplex'];
+  return generator($p);
+});

@@ -10,7 +10,7 @@ export interface NoiseParams {
 
 // Mulberry32 — fast, good-quality seeded PRNG; no extra dependency needed.
 // simplex-noise accepts any () => number as its random source.
-function mulberry32(seed: number): () => number {
+export function mulberry32(seed: number): () => number {
   return () => {
     seed = (seed + 0x6d2b79f5) | 0;
     let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
