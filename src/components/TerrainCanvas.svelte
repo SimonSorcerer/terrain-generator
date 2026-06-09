@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
   import { terrainParams, heightmap, waterParams } from '../stores/terrain';
+  import { sceneParams } from '../stores/scene';
   import { initScene } from '../lib/renderer/scene';
   import { createTerrainMesh, updateTerrainMesh } from '../lib/renderer/terrain-mesh';
   import { createWaterMesh, updateWaterLevel, updateWaterAppearance } from '../lib/renderer/water-mesh';
@@ -30,6 +31,11 @@
       updateWaterAppearance(water, wp);
     });
 
+    const unsubScene = sceneParams.subscribe((sp) => {
+      ctx.setFog(sp.fogEnabled, sp.fogDensity, sp.fogColor);
+      ctx.setSunAngle(sp.sunAzimuth, sp.sunElevation, sp.sunIntensity);
+    });
+
     const ro = new ResizeObserver((entries) => {
       const { width, height } = entries[0].contentRect;
       ctx.resize(width, height);
@@ -42,6 +48,7 @@
     return () => {
       unsubTerrain();
       unsubWater();
+      unsubScene();
       ro.disconnect();
       ctx.dispose();
     };

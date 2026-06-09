@@ -1,6 +1,11 @@
 <script lang="ts">
   import { terrainParams, waterParams } from '../stores/terrain';
+  import { sceneParams } from '../stores/scene';
   import { GENERATORS, GENERATOR_LABELS } from '../lib/terrain/generator';
+
+  function setScene<K extends keyof typeof $sceneParams>(key: K, value: typeof $sceneParams[K]) {
+    sceneParams.update((p) => ({ ...p, [key]: value }));
+  }
 
   function set<K extends keyof typeof $terrainParams>(key: K, value: typeof $terrainParams[K]) {
     terrainParams.update((p) => ({ ...p, [key]: value }));
@@ -92,7 +97,7 @@
         value={$terrainParams.generatorType}
         onchange={(e) => set('generatorType', e.currentTarget.value)}
       >
-        {#each Object.keys(GENERATORS) as key}
+        {#each Object.keys(GENERATORS) as key (key)}
           <option value={key}>{GENERATOR_LABELS[key] ?? key}</option>
         {/each}
       </select>
@@ -224,6 +229,41 @@
           oninput={(e) => set('gravity', +e.currentTarget.value)}
         />
       </label>
+
+      <label class="row-label">
+        <span class="param-name" data-tooltip="Runs a thermal erosion pass after the hydraulic simulation. Smooths the steep cliff walls left by water erosion into realistic scree slopes. Compare before/after by toggling.">Thermal erosion pass</span>
+        <input
+          type="checkbox"
+          checked={$terrainParams.thermalEnabled}
+          onchange={(e) => set('thermalEnabled', e.currentTarget.checked)}
+        />
+      </label>
+
+      {#if $terrainParams.thermalEnabled}
+        <label>
+          <div class="row">
+            <span class="param-name" data-tooltip="Number of smoothing passes. More iterations converge toward the talus angle but take longer to compute.">Thermal iterations</span>
+            <span class="value">{$terrainParams.thermalIterations}</span>
+          </div>
+          <input
+            type="range" min="1" max="50" step="1"
+            value={$terrainParams.thermalIterations}
+            oninput={(e) => set('thermalIterations', +e.currentTarget.value)}
+          />
+        </label>
+
+        <label>
+          <div class="row">
+            <span class="param-name" data-tooltip="Maximum stable slope before material slides. Lower values produce smoother, more gently graded terrain; higher values allow steeper stable faces.">Talus angle</span>
+            <span class="value">{$terrainParams.talusAngle.toFixed(3)}</span>
+          </div>
+          <input
+            type="range" min="0.005" max="0.2" step="0.005"
+            value={$terrainParams.talusAngle}
+            oninput={(e) => set('talusAngle', +e.currentTarget.value)}
+          />
+        </label>
+      {/if}
     {/if}
 
     <label>
@@ -304,15 +344,105 @@
       />
     </label>
   </section>
+
+  <section>
+    <h3>Scene</h3>
+
+    <label class="row-label">
+      <span class="param-name" data-tooltip="Adds exponential atmospheric haze that fades distant terrain to the fog color. Improves depth perception and hides the terrain edge.">Fog</span>
+      <input
+        type="checkbox"
+        checked={$sceneParams.fogEnabled}
+        onchange={(e) => setScene('fogEnabled', e.currentTarget.checked)}
+      />
+    </label>
+
+    {#if $sceneParams.fogEnabled}
+      <label>
+        <div class="row">
+          <span class="param-name" data-tooltip="How thick the fog is. Higher values make the haze denser and start closer to the camera.">Fog density</span>
+          <span class="value">{$sceneParams.fogDensity.toFixed(4)}</span>
+        </div>
+        <input
+          type="range" min="0.0005" max="0.01" step="0.0005"
+          value={$sceneParams.fogDensity}
+          oninput={(e) => setScene('fogDensity', +e.currentTarget.value)}
+        />
+      </label>
+
+      <label>
+        <div class="row">
+          <span class="param-name" data-tooltip="Color of the fog and scene background. Should match the sky tone you want — dark blue for night, light grey for overcast.">Fog color</span>
+        </div>
+        <input
+          type="color"
+          value={$sceneParams.fogColor}
+          oninput={(e) => setScene('fogColor', e.currentTarget.value)}
+        />
+      </label>
+    {/if}
+
+    <label>
+      <div class="row">
+        <span class="param-name" data-tooltip="Horizontal angle of the sun around the terrain. Rotating it changes which faces are lit and which are in shadow.">Sun azimuth</span>
+        <span class="value">{$sceneParams.sunAzimuth}°</span>
+      </div>
+      <input
+        type="range" min="0" max="360" step="1"
+        value={$sceneParams.sunAzimuth}
+        oninput={(e) => setScene('sunAzimuth', +e.currentTarget.value)}
+      />
+    </label>
+
+    <label>
+      <div class="row">
+        <span class="param-name" data-tooltip="Vertical angle of the sun above the horizon. Low values produce long shadows and dramatic side-lighting; high values light terrain more evenly from above.">Sun elevation</span>
+        <span class="value">{$sceneParams.sunElevation}°</span>
+      </div>
+      <input
+        type="range" min="5" max="90" step="1"
+        value={$sceneParams.sunElevation}
+        oninput={(e) => setScene('sunElevation', +e.currentTarget.value)}
+      />
+    </label>
+
+    <label>
+      <div class="row">
+        <span class="param-name" data-tooltip="Brightness of the directional sun light. Higher values increase contrast between lit and shadowed faces.">Sun intensity</span>
+        <span class="value">{$sceneParams.sunIntensity.toFixed(1)}</span>
+      </div>
+      <input
+        type="range" min="0" max="3" step="0.1"
+        value={$sceneParams.sunIntensity}
+        oninput={(e) => setScene('sunIntensity', +e.currentTarget.value)}
+      />
+    </label>
+  </section>
 </div>
 
 <style>
+  .row-label {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+
   .hint {
     margin: 0;
     font-size: 10px;
     color: #a08040;
     font-style: italic;
   }
+
+  input[type='checkbox'] {
+    width: 14px;
+    height: 14px;
+    accent-color: #4a90d9;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
   .panel {
     padding: 16px;
     display: flex;

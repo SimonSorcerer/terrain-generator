@@ -1,5 +1,6 @@
 import { mulberry32 } from '../noise';
 import { simplexGenerator } from './simplex';
+import { thermalErode } from './thermal-erosion';
 import type { GeneratorFn, GeneratorParams } from '../generator';
 
 export const hydraulicErosionGenerator: GeneratorFn = (params: GeneratorParams): Float32Array => {
@@ -7,6 +8,10 @@ export const hydraulicErosionGenerator: GeneratorFn = (params: GeneratorParams):
   const mapSize = params.resolution + 1;
 
   erode(heights, mapSize, params);
+
+  if (params.thermalEnabled) {
+    thermalErode(heights, mapSize, params);
+  }
 
   let min = heights[0];
   let max = heights[0];

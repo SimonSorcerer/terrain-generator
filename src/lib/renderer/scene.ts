@@ -10,6 +10,8 @@ export interface SceneContext {
   stopLoop: () => void;
   resize: (width: number, height: number) => void;
   dispose: () => void;
+  setFog: (enabled: boolean, density: number, color: string) => void;
+  setSunAngle: (azimuthDeg: number, elevationDeg: number, intensity: number) => void;
 }
 
 export function initScene(canvas: HTMLCanvasElement): SceneContext {
@@ -35,6 +37,31 @@ export function initScene(canvas: HTMLCanvasElement): SceneContext {
 
   const ambLight = new THREE.AmbientLight(0x8090a0, 0.6);
   scene.add(ambLight);
+
+  const clearColor = new THREE.Color(0x0d0d0f);
+
+  function setFog(enabled: boolean, density: number, color: string): void {
+    if (enabled) {
+      const fogColor = new THREE.Color(color);
+      scene.fog = new THREE.FogExp2(fogColor, density);
+      renderer.setClearColor(fogColor);
+    } else {
+      scene.fog = null;
+      renderer.setClearColor(clearColor);
+    }
+  }
+
+  function setSunAngle(azimuthDeg: number, elevationDeg: number, intensity: number): void {
+    const az = (azimuthDeg * Math.PI) / 180;
+    const el = (elevationDeg * Math.PI) / 180;
+    const dist = 200;
+    dirLight.position.set(
+      dist * Math.cos(el) * Math.sin(az),
+      dist * Math.sin(el),
+      dist * Math.cos(el) * Math.cos(az),
+    );
+    dirLight.intensity = intensity;
+  }
 
   let rafId: number | null = null;
 
@@ -79,5 +106,5 @@ export function initScene(canvas: HTMLCanvasElement): SceneContext {
     renderer.dispose();
   }
 
-  return { scene, camera, renderer, controls, startLoop, stopLoop, resize, dispose };
+  return { scene, camera, renderer, controls, startLoop, stopLoop, resize, dispose, setFog, setSunAngle };
 }

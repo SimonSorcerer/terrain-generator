@@ -16,6 +16,10 @@ export interface GeneratorParams extends NoiseParams {
   evaporateSpeed?: number;
   gravity?: number;
   erosionRadius?: number;
+  // Thermal erosion (Task 16)
+  thermalEnabled?: boolean;
+  thermalIterations?: number;
+  talusAngle?: number;
 }
 
 export type GeneratorFn = (params: GeneratorParams) => Float32Array;
